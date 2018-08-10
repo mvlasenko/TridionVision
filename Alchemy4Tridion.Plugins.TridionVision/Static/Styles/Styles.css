@@ -1,0 +1,16 @@
+﻿.contextmenu #cm_tridion_vision > .image
+{
+    background-image: url('${ImgUrl}mm.jpg.16x16.png');
+}
+
+/* main icon in full ribbon mode */
+.ribbontoolbar #TridionVisionButton.button .image
+{
+    background-image: url('${ImgUrl}mm.jpg.32x32.png');
+}
+
+/* main icon in minimized ribbon mode */
+.ribbontoolbar.minimized #TridionVisionButton.button .image
+{
+    background-image: url('${ImgUrl}mm.jpg.16x16.png');
+}

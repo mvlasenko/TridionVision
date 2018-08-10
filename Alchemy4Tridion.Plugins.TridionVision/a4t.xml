@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<plugin xmlns:c="https://www.alchemywebstore.com/configuration/definitions" xmlns="http://www.alchemywebstore.com/">
+  <name>Tridion_Vision</name>
+  <description><![CDATA[
+
+Tridion Vision
+
+]]></description>
+  <version>1.0.0.0</version>
+  <references />
+  <settings>
+    <client>
+      <Color>#0000FF</Color>
+    </client>
+  </settings>
+  <frameworkVersion>1.0.1.1</frameworkVersion>
+  <AlchemyUploadDialog>None</AlchemyUploadDialog>
+</plugin>

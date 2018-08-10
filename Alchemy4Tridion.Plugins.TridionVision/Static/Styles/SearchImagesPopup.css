@@ -1,0 +1,189 @@
+﻿body {
+    background-color: #ebedf0;
+    padding-top: 15px;
+}
+
+.tabs {
+    font-family: Helvetica,Arial,sans-serif;
+    padding: 0;
+    z-index: 3;
+    margin-bottom: -1px;
+    position: relative;
+    margin-left: 15px;
+}
+
+.tabs > div {
+    border-width: 1px 1px 1px 0;
+    border-style: solid solid solid none;
+    border-color: #AAA #AAAAAA #A1A9B2;
+    padding: 3px 5px;
+    color: #222e39;
+    background-color: #ededed;
+    outline: none;
+    display: inline-block;
+    cursor: default;
+}
+
+.tabs > div:first-child {
+    border-left: 1px solid #aaa;
+}
+
+.tabs > div.active {
+    border-bottom-style: none;
+    padding-bottom: 4px;
+    background-color: #fafafa;
+    color: #41464c;
+    cursor: default;
+}
+
+.tab-body {
+    background: none repeat scroll 0 0 #fafafa;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    display: block;
+    margin-bottom: 2em;
+    padding: 0;
+    position: relative;
+    height: 320px;
+    display: none;
+    padding: 10px;
+    overflow: auto;
+}
+
+.tab-body.active {
+    display: block;
+}
+
+.item {
+    cursor: pointer;
+    border-bottom: 1px solid #b8c1cc;
+    font-size: 11px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item.selected {
+    color: #fff;
+    background-color: blue;
+}
+
+.results {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: separate;
+    border-top: 1px solid #b8c1cc;
+    border-left: 1px solid #b8c1cc;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+.results .headings {
+    background-color: #EDEDED;
+    font-size: 11px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.results .headings th {
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+.results td {
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+.results .item.disabled {
+    color: #AAA;
+    text-shadow: 1px 1px #FFF;
+    cursor: default;
+}
+
+.name {
+    width: 40%;
+    height: 16px;
+}
+
+.path {
+    width: 60%;
+    height: 16px;
+    padding-left: 2px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.operation {
+    width: 55px;
+    height: 16px;
+    padding-left: 2px;
+    text-align: center;
+}
+
+div .treeicon {
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+div .icon {
+    width: 16px;
+    height: 16px;
+    margin: 1px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+div .title {
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.controls {
+    padding: 10px;
+}
+
+.button {
+    margin-right: 12px;
+    margin-bottom: 12px;
+}
+
+.button.enabled {
+    cursor: pointer;
+}
+
+#rowHeader td
+{
+    padding-top: 10px;
+	padding-left: 10px;
+	color: #00458c; 
+	font-size: 16pt;
+}
+
+#SearchImagesPopup table tr td
+{
+    padding-left: 10px;
+    width: 100%;
+}
+
+#BtnCancel
+{
+    margin-left: 10px;
+}
+
+.checkboxLabel
+{
+    cursor: pointer;
+}
