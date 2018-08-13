@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using Alchemy4Tridion.Plugins.Clients.CoreService;
 using Alchemy4Tridion.Plugins.TridionVision.Helpers;
 using Alchemy4Tridion.Plugins.TridionVision.Models;
 
@@ -17,7 +18,7 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
             {
                 string html = "<table class=\"usingItems results\">";
 
-                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, true);
+                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, true, new ItemType[] { ItemType.Component });
 
                 html += CreateItemsHeading();
 
