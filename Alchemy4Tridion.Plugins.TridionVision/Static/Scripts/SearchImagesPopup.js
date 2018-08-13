@@ -27,7 +27,6 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
 
     c.BtnSearch = $controls.getControl($("#BtnSearch"), "Tridion.Controls.Button");
     c.BtnOk = $controls.getControl($("#BtnOk"), "Tridion.Controls.Button");
-    c.BtnCancel = $controls.getControl($("#BtnCancel"), "Tridion.Controls.Button");
 
     $evt.addEventHandler(c.BtnSearch, "click", function (e) {
         showItems(uri, $j("#word").val());
@@ -38,16 +37,10 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
         reportOptionsPopup.close();
     });
 
-    $evt.addEventHandler(c.BtnCancel, "click", function (e) {
-        var reportOptionsPopup = window.parent.SearchImagesPopup;
-        reportOptionsPopup.close();
-    });
-
+    $j("#progBar").hide();
 };
 
 function showItems(tcmFolder, word) {
-
-    //todo: disable buttons
 
     //enable progress bar
     $j("#progBar").show();
