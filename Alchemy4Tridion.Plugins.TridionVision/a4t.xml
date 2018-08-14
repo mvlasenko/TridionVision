@@ -7,7 +7,21 @@ Tridion Vision
 
 ]]></description>
   <version>1.0.0.0</version>
-  <references />
+  <references>
+    <add file="Google.Api.CommonProtos.dll" name="Google.Api.CommonProtos" version="1.2.0.0" />
+    <add file="Google.Api.Gax.dll" name="Google.Api.Gax" version="2.3.0.0" />
+    <add file="Google.Api.Gax.Grpc.dll" name="Google.Api.Gax.Grpc" version="2.3.0.0" />
+    <add file="Google.Apis.dll" name="Google.Apis" version="1.32.2.0" />
+    <add file="Google.Apis.PlatformServices.dll" name="Google.Apis.PlatformServices" version="1.32.2.0" />
+    <add file="Google.Apis.Auth.dll" name="Google.Apis.Auth" version="1.32.2.0" />
+    <add file="Google.Apis.Auth.PlatformServices.dll" name="Google.Apis.Auth.PlatformServices" version="1.32.2.0" />
+    <add file="Google.Apis.Core.dll" name="Google.Apis.Core" version="1.32.2.0" />
+    <add file="Google.Cloud.Vision.V1.dll" name="Google.Cloud.Vision.V1" version="1.2.0.0" />
+    <add file="Google.LongRunning.dll" name="Google.LongRunning" version="1.0.0.0" />
+    <add file="Google.Protobuf.dll" name="Google.Protobuf" version="3.5.1.0" />
+    <add file="Grpc.Auth.dll" name="Grpc.Auth" version="1.0.0.0" />
+    <add file="Grpc.Core.dll" name="Grpc.Core" version="1.0.0.0" />
+  </references>
   <settings>
     <client>
       <Color>#0000FF</Color>
