@@ -239,6 +239,25 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
 
         #endregion
 
+        #region Multimedia
+
+        public static byte[] GetBinaryFromMultimediaComponent(IAlchemyStreamDownload client, ComponentData multimediaComponent)
+        {
+            byte[] binaryContent = null;
+            using (Stream tempStream = client.DownloadBinaryContent(multimediaComponent.Id))
+            {
+                if (multimediaComponent.BinaryContent.FileSize != -1)
+                {
+                    var memoryStream = new MemoryStream();
+                    tempStream.CopyTo(memoryStream);
+                    binaryContent = memoryStream.ToArray();
+                }
+            }
+            return binaryContent;
+        }
+
+        #endregion
+
         #region Tridion publishing
 
         /// <summary>

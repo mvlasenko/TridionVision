@@ -15,7 +15,7 @@
                     <div style="display: inline-block; vertical-align: top; padding-left: 10px;">
                         Name of object:
                     </div>
-                    <input id="word" style="display: inline-block; vertical-align: top" />
+                    <input id="word" style="display: inline-block; vertical-align: top" placeholder="all" />
                     <div style="display: inline-block; vertical-align: top">
                         <c:button id="BtnSearch" runat="server" tabindex="1" label="Search"></c:button>
                     </div>
@@ -33,7 +33,7 @@
             <tr id="FooterRow">
                 <td>
                     <div style="padding-left: 10px;">
-                        <c:button id="BtnOk" runat="server" tabindex="2" label="OK"></c:button>
+                        <c:button id="BtnOk" runat="server" tabindex="2" label="Close"></c:button>
                     </div>
                 </td>
             </tr>

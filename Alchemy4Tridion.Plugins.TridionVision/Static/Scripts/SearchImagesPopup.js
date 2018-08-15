@@ -29,7 +29,11 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
     c.BtnOk = $controls.getControl($("#BtnOk"), "Tridion.Controls.Button");
 
     $evt.addEventHandler(c.BtnSearch, "click", function (e) {
-        showItems(uri, $j("#word").val());
+        var word = $j("#word").val();
+        if(!word)
+            word = "all";
+
+        showItems(uri, word);
     });
 
     $evt.addEventHandler(c.BtnOk, "click", function (e) {
