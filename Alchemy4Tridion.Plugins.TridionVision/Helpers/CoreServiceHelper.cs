@@ -64,6 +64,19 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
         }
 
         /// <summary>
+        /// Gets Tridion items by parent container.
+        /// </summary>
+        /// <param name="client">Tridion client object.</param>
+        /// <param name="tcmContainer">The TCM container.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="itemTypes">Item types.</param>
+        /// <returns></returns>
+        public static List<ItemInfo> GetItemsByParentContainer(IAlchemyCoreServiceClient client, string tcmContainer, bool recursive, ComponentType[] componentTypes)
+        {
+            return client.GetListXml(tcmContainer, new OrganizationalItemItemsFilterData { Recursive = recursive, ItemTypes = new ItemType[] { ItemType.Component }, ComponentTypes = componentTypes }).ToList();
+        }
+
+        /// <summary>
         /// Gets the web dav of Tridion item.
         /// </summary>
         /// <param name="item">Tridion item.</param>

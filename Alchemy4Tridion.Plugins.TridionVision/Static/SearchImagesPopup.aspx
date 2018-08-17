@@ -25,7 +25,7 @@
                 <td id="itemTypes">
 
                     <div class="tab-body active">
-                        <progress id="progBar"></progress>
+                        
                     </div>
 
                 </td> 

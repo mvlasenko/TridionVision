@@ -44,7 +44,7 @@
     margin-bottom: 2em;
     padding: 0;
     position: relative;
-    height: 400px;
+    height: 420px;
     width: 760px;
     display: none;
     padding: 10px;
@@ -111,13 +111,12 @@
     cursor: default;
 }
 
-.name {
+.icon {
     width: 10%;
     height: 16px;
     padding-left: 2px;
     vertical-align: middle;
-    white-space: nowrap;
-    overflow: hidden;
+    text-align: center;
 }
 
 .name {
@@ -149,20 +148,17 @@
     cursor: pointer;
 }
 
-#rowHeader td
-{
+#rowHeader td {
     padding: 10px;
 	color: #00458c; 
 	font-size: 16pt;
 }
 
-#SearchImagesPopup table tr td
-{
+#SearchImagesPopup table tr td {
     padding-left: 10px;
     width: 100%;
 }
 
-.checkboxLabel
-{
+.checkboxLabel {
     cursor: pointer;
 }

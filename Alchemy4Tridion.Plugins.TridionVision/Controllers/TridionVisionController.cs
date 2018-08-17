@@ -30,7 +30,7 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
 
                 string html = "<table class=\"usingItems results\">";
 
-                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, true, new ItemType[] { ItemType.Component });
+                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, true, new ComponentType[] { ComponentType.Multimedia });
 
                 html += CreateItemsHeading();
 
@@ -43,13 +43,37 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
 
                     item.Icon = "/WebUI/Editors/Base/icon.png?target=view&maxwidth=40&maxheight=200&uri=tcm%3A" + item.TcmId.Replace("tcm:", "") + "&mode=thumb&modified=" + component.VersionInfo.RevisionDate.Value.ToString("yyyy-MM-ddTHH:mm:ss.000");
 
-                    byte[] bytes = CoreServiceHelper.GetBinaryFromMultimediaComponent(this.Clients.SessionAwareCoreServiceDownloadClient, component);
+                    List<string> list = new List<string>();
 
-                    var image = Image.FromBytes(bytes);
+                    List<string> usedKeywords = CoreServiceHelper.GetUsedItems(this.Clients.SessionAwareCoreServiceClient, item.TcmId, new ItemType[] { ItemType.Keyword });
+                    if (usedKeywords != null && usedKeywords.Any())
+                    {
 
-                    var response = client.DetectLabels(image);
 
-                    var list = response.ToList().Select(x => x.Description).ToList();
+                    }
+                    else
+                    {
+                        byte[] bytes = CoreServiceHelper.GetBinaryFromMultimediaComponent(this.Clients.SessionAwareCoreServiceDownloadClient, component);
+
+                        var image = Image.FromBytes(bytes);
+
+                        var response1 = client.DetectLabels(image);
+                        list.AddRange(response1.ToList().Select(x => x.Description));
+
+                        //detect landmarks 
+                        if (list.Contains("landmark"))
+                        {
+                            var response2 = client.DetectLandmarks(image);
+                            list.AddRange(response2.ToList().Select(x => x.Description));
+                        }
+
+                        //detect logos 
+                        if (list.Contains("logo"))
+                        {
+                            var response3 = client.DetectLogos(image);
+                            list.AddRange(response3.ToList().Select(x => x.Description));
+                        }
+                    }
 
                     item.Path = string.Join(", ", list);
 
