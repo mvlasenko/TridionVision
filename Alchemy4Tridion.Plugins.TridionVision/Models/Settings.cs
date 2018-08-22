@@ -2,6 +2,7 @@
 {
     public class Settings
     {
-        public string Color { get; set; }
+        public string CategoryId { get; set; }
+        public string ApiKeyFilePath { get; set; }
     }
 }

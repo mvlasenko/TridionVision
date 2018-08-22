@@ -143,6 +143,7 @@
     <Compile Include="GUI\TridionVisionCommandSet.cs" />
     <Compile Include="GUI\TridionVisionContextMenuExtension.cs" />
     <Compile Include="GUI\TridionVisionOptionsPopupResourceGroup.cs" />
+    <Compile Include="GUI\TridionVisionDashboardResourceGroup.cs" />
     <Compile Include="GUI\TridionVisionResourceGroup.cs" />
     <Compile Include="GUI\TridionVisionRibbonToolbarButton.cs" />
     <Compile Include="Helpers\CoreServiceHelper.cs" />
@@ -161,6 +162,7 @@
     <Content Include="Static\Images\mm.jpg.24x24.png" />
     <Content Include="Static\Images\mm.jpg.32x32.png" />
     <Content Include="Static\Images\mm.jpg.48x48.png" />
+    <Content Include="Static\Scripts\TridionVisionDashboard.js" />
     <Content Include="Static\Scripts\TridionVisionCommand.js" />
     <Content Include="Static\Scripts\SearchImagesPopup.js" />
     <Content Include="Static\SearchImagesPopup.aspx">

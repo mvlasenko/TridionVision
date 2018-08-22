@@ -24,7 +24,8 @@ Tridion Vision
   </references>
   <settings>
     <client>
-      <Color>#0000FF</Color>
+      <CategoryId>tcm:1-1-512</CategoryId>
+      <ApiKeyFilePath>c:\Projects\TridionVision\Tridion-Vision.json</ApiKeyFilePath>
     </client>
   </settings>
   <frameworkVersion>1.0.1.1</frameworkVersion>

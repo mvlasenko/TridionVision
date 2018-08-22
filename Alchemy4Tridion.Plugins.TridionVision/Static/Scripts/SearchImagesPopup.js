@@ -25,15 +25,20 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
 
     var uri = $url.getHashParam("uri");
 
+    c.BtnGenerate = $controls.getControl($("#BtnGenerate"), "Tridion.Controls.Button");
     c.BtnSearch = $controls.getControl($("#BtnSearch"), "Tridion.Controls.Button");
     c.BtnOk = $controls.getControl($("#BtnOk"), "Tridion.Controls.Button");
+
+    $evt.addEventHandler(c.BtnGenerate, "click", function (e) {
+        showItems(uri, "all", true);
+    });
 
     $evt.addEventHandler(c.BtnSearch, "click", function (e) {
         var word = $j("#word").val();
         if(!word)
             word = "all";
 
-        showItems(uri, word);
+        showItems(uri, word, true);
     });
 
     $evt.addEventHandler(c.BtnOk, "click", function (e) {
@@ -41,16 +46,18 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
         reportOptionsPopup.close();
     });
 
+    showItems(uri, "all", false);
+
 };
 
-function showItems(tcmFolder, word) {
+function showItems(tcmFolder, word, generate) {
 
     //enable progress bar
     $j(".tab-body.active").empty();
     $j(".tab-body.active").append("<progress></progress>");
 
     // This is the call to my controller where the core service code is used get the list of items
-    Alchemy.Plugins["${PluginName}"].Api.TridionVisionService.getItems(tcmFolder, word).success(function (items) {
+    Alchemy.Plugins["${PluginName}"].Api.TridionVisionService.getItems(tcmFolder, word, generate).success(function (items) {
 
         //show list of items
         $j(".tab-body.active").empty();

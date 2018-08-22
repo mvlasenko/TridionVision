@@ -14,7 +14,7 @@ namespace Alchemy4Tridion.Plugins.TridionVision.GUI
             // Use this property to specify where in the context menu your items will go
             InsertBefore = Constants.ContextMenuIds.MainContextMenu.Versioning;
 
-            AddItem("cm_tridion_vision", "Search Images", "TridionVisionCommand");
+            AddItem("cm_tridion_vision", "Auto-classify Images", "TridionVisionCommand");
 
             // We need to add our resource group as a dependency to this extension
             Dependencies.Add<TridionVisionResourceGroup>();

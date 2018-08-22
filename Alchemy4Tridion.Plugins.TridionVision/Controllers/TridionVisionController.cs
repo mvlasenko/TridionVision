@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using Alchemy4Tridion.Plugins.Clients.CoreService;
 using Alchemy4Tridion.Plugins.TridionVision.Helpers;
 using Alchemy4Tridion.Plugins.TridionVision.Models;
 using Google.Cloud.Vision.V1;
-using System.Linq;
 
 namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
 {
@@ -13,24 +13,32 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
     public class TridionVisionController : AlchemyApiController
     {
         [HttpGet]
-        [Route("Items/{tcmFolder}/{word}")]
-        public string GetItems(string tcmFolder, string word)
+        [Route("Items/{tcmFolder}/{word}/{generate}")]
+        public string GetItems(string tcmFolder, string word, bool generate)
         {
             try
             {
-                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\\Projects\\GoogleVisionTest\\tridion-vision.json");
+                //var yyy = CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, "tcm:5061-29508");
 
-                string val = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+                Settings settings = Plugin.Settings.Get<Settings>();
+                List<ItemInfo> keywords = CoreServiceHelper.GetKeywordsByCategory(this.Clients.SessionAwareCoreServiceClient, settings.CategoryId);
+
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", settings.ApiKeyFilePath);
 
                 // Instantiates a client
                 var client = ImageAnnotatorClient.Create();
-                // Load the image file into memory
-                //var image = Image.FromFile("c:\\Projects\\GoogleVisionTest\\testl.jpg");
-
 
                 string html = "<table class=\"usingItems results\">";
 
-                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, true, new ComponentType[] { ComponentType.Multimedia });
+                List<ItemInfo> items = GetMultimediaCompoents("tcm:" + tcmFolder);
+
+                foreach (ItemInfo item in items)
+                {
+                    if (!item.IsLocal)
+                    {
+                        item.TcmId = CoreServiceHelper.GetBluePrintTopTcmId(this.Clients.SessionAwareCoreServiceClient, item.TcmId);
+                    }
+                }
 
                 html += CreateItemsHeading();
 
@@ -46,12 +54,17 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
                     List<string> list = new List<string>();
 
                     List<string> usedKeywords = CoreServiceHelper.GetUsedItems(this.Clients.SessionAwareCoreServiceClient, item.TcmId, new ItemType[] { ItemType.Keyword });
-                    if (usedKeywords != null && usedKeywords.Any())
+                    if (usedKeywords != null && usedKeywords.Any(kw => keywords.Any(x => x.TcmId.GetId() == kw.GetId())))
                     {
-
-
+                        foreach (string usedKeyword in usedKeywords)
+                        {
+                            if (keywords.Any(x => x.TcmId.GetId() == usedKeyword.GetId()))
+                            {
+                                list.Add(keywords.First(x => x.TcmId.GetId() == usedKeyword.GetId()).Title);
+                            }
+                        }
                     }
-                    else
+                    else if(generate)
                     {
                         byte[] bytes = CoreServiceHelper.GetBinaryFromMultimediaComponent(this.Clients.SessionAwareCoreServiceDownloadClient, component);
 
@@ -73,11 +86,20 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
                             var response3 = client.DetectLogos(image);
                             list.AddRange(response3.ToList().Select(x => x.Description));
                         }
+
+                        //add to taxonomy
+                        foreach (string keywordName in list)
+                        {
+                            CoreServiceHelper.AddKeyword(this.Clients.SessionAwareCoreServiceClient, settings.CategoryId, keywordName);
+                        }
+
+                        //add to metadata
+                        CoreServiceHelper.AppendMetadata(this.Clients.SessionAwareCoreServiceClient, item.TcmId, list);
                     }
 
                     item.Path = string.Join(", ", list);
 
-                    if (word == "all" || list.Contains(word))
+                    if (word == "all" || list.Contains(word) || !generate)
                     {
                         html += CreateItem(item) + Environment.NewLine;
                     }
@@ -93,6 +115,29 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
             {
                 throw ex;
             }
+        }
+
+        private List<ItemInfo> GetMultimediaCompoents(string tcmItem)
+        {
+            if (CoreServiceHelper.GetItemType(tcmItem) == ItemType.Folder)
+            {
+                return CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, tcmItem, true, new ComponentType[] { ComponentType.Multimedia });
+            }
+            if (CoreServiceHelper.GetItemType(tcmItem) == ItemType.Component)
+            {
+                ComponentData component = (ComponentData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, tcmItem);
+
+                if (component.ComponentType == ComponentType.Multimedia)
+                {
+                    return new List<ItemInfo> { component.ToItem() };
+                }
+                else
+                {
+                    List<string> used = CoreServiceHelper.GetUsedItems(this.Clients.SessionAwareCoreServiceClient, tcmItem, new ItemType[] { ItemType.Component });
+                    return used.Select(x => (ComponentData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, x)).Where(x => x.ComponentType == ComponentType.Multimedia).Select(x => x.ToItem()).ToList();
+                }
+            }
+            return new List<ItemInfo>();
         }
 
         private string CreateItemsHeading()
@@ -115,6 +160,40 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
             html += string.Format("<td class=\"path\" title=\"{1} ({2})\">{0}</td>", item.Path, item.Title, item.TcmId);
             html += "</tr>";
             return html;
+        }
+
+        [HttpGet]
+        [Route("Counts/{tcmFolder}")]
+        public List<string> GetCounts(string tcmFolder)
+        {
+            try
+            {
+                List<ItemInfo> topItems = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, "tcm:" + tcmFolder, false, new ItemType[] { ItemType.Folder, ItemType.Component });
+
+                List<string> res = new List<string>();
+
+                foreach (ItemInfo topItem in topItems)
+                {
+                    if (topItem.ItemType == ItemType.Folder)
+                    {
+                        int count = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, topItem.TcmId, true, new ComponentType[] { ComponentType.Multimedia }).Count;
+                        if (count > 0)
+                        {
+                            res.Add(topItem.TcmId.Replace("tcm:", ""));
+                        }
+                    }
+                    else
+                    {
+                        res.Add(topItem.TcmId.Replace("tcm:", ""));
+                    }
+                }
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
     }

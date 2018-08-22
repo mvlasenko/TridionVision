@@ -13,10 +13,10 @@ namespace Alchemy4Tridion.Plugins.TridionVision.GUI
             Command = "TridionVisionCommand";
 
             // The label of the button.
-            Name = "Search Images";
+            Name = "Auto-classify Images";
 
             // The tooltip label that will get applied.
-            Title = "Search Images";
+            Title = "Auto-classify Images";
 
             // The page tab to assign this extension to. See Constants.PageIds.
             PageId = Constants.PageIds.HomePage;

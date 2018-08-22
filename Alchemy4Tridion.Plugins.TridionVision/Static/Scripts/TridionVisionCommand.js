@@ -32,14 +32,22 @@ Alchemy.command("${PluginName}", "TridionVisionCommand", {
             var itemType = $models.getItemType(itemUri);
 
             if (
-                itemType === $const.ItemType.FOLDER
+                itemType === $const.ItemType.FOLDER || itemType === $const.ItemType.COMPONENT
             ) { }
             else {
                 return false;
             }
         }
 
-        return true;
+        if (!window.currentFolderImagesCounts)
+            return true;
+
+        for (var i = 0; i < window.currentFolderImagesCounts.length; i++) {
+            if (window.currentFolderImagesCounts[i].split('-')[1] == itemUri.split('-')[1])
+                return true;
+        }
+
+        return false;
     },
 
 
@@ -62,18 +70,31 @@ Alchemy.command("${PluginName}", "TridionVisionCommand", {
             var itemType = $models.getItemType(itemUri);
 
             if (
-                itemType === $const.ItemType.FOLDER
+                itemType === $const.ItemType.FOLDER || itemType === $const.ItemType.COMPONENT
             ) { }
             else {
                 return false;
             }
-
         }
 
-        return true;
+        if (!window.currentFolderImagesCounts)
+            return true;
+
+        for (var i = 0; i < window.currentFolderImagesCounts.length; i++) {
+            if (window.currentFolderImagesCounts[i].split('-')[1] == itemUri.split('-')[1])
+                return true;
+        }
+
+        return false;
     },
 
     execute: function (selection) {
+
+        if (window.currentFolderImagesCount > 10)
+        {
+            alert("This folder contains more than 10 multimedia components. Please select another folder.");
+            return false;
+        }
 
         var uri = "";
 

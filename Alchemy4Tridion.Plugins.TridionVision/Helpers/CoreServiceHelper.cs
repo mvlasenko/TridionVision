@@ -145,6 +145,11 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
             return items;
         }
 
+        public static List<ItemInfo> GetKeywordsByCategory(IAlchemyCoreServiceClient client, string tcmCategory)
+        {
+            return client.GetListXml(tcmCategory, new OrganizationalItemItemsFilterData { ItemTypes = new[] { ItemType.Keyword } }).ToList(ItemType.Keyword);
+        }
+
         #endregion
 
         #region Tridion schemas
@@ -269,6 +274,81 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
             return binaryContent;
         }
 
+        public static void AddKeyword(IAlchemyCoreServiceClient client, string tcmCategory, string keywordName)
+        {
+            List<ItemInfo> keywords = GetKeywordsByCategory(client, tcmCategory);
+            if (keywords.All(x => x.Title != keywordName))
+            {
+                KeywordData keyword = new KeywordData
+                {
+                    Title = keywordName,
+                    Key = keywordName,
+                    Description = keywordName,
+                    LocationInfo = new LocationInfo { OrganizationalItem = new LinkToOrganizationalItemData { IdRef = tcmCategory } },
+                    Id = "tcm:0-0-0"
+                };
+
+                keyword = (KeywordData)client.Create(keyword, new ReadOptions());
+            }
+        }
+
+        public static void AppendMetadata(IAlchemyCoreServiceClient client, string componentUri, List<string> list)
+        {
+            ComponentData component = ReadItem(client, componentUri) as ComponentData;
+
+            if (component.BluePrintInfo.IsShared == true)
+            {
+                componentUri = GetBluePrintLocalizedTcmId(component);
+                component = ReadItem(client, componentUri) as ComponentData;
+            }
+
+            SchemaData schema = ReadItem(client, component.Schema.IdRef) as SchemaData;
+            XNamespace ns = schema.NamespaceUri;
+
+            try
+            {
+                component = client.CheckOut(component.Id, true, new ReadOptions()) as ComponentData;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                if (string.IsNullOrEmpty(component.Metadata))
+                {
+                    XElement metadataXml = new XElement(ns + "Metadata");
+
+                    foreach (string keywordName in list)
+                    {
+                        metadataXml.Add(new XElement(ns + "Keywords", keywordName));
+                    }
+
+                    component.Metadata = metadataXml.ToString();
+                }
+                else
+                {
+                    XDocument docMetadata = XDocument.Parse(component.Metadata);
+                    XElement metadataXml = docMetadata.Root;
+
+                    foreach (string keywordName in list)
+                    {
+                        metadataXml.Add(new XElement(ns + "Keywords", keywordName));
+                    }
+
+                    component.Metadata = metadataXml.ToString();
+                }
+
+                client.Update(component, new ReadOptions());
+
+                client.CheckIn(component.Id, true, "Updated by Tridion Vision Alchemy Plugin", new ReadOptions());
+            }
+            catch (Exception ex)
+            {
+                client.UndoCheckOut(componentUri, true, new ReadOptions());
+            }
+        }
+
         #endregion
 
         #region Tridion publishing
@@ -297,6 +377,20 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
         #endregion
 
         #region Tridion Blueprint
+
+        public static string GetBluePrintTopTcmId(IAlchemyCoreServiceClient client, string id)
+        {
+            if (id.StartsWith("tcm:0-"))
+                return id;
+
+            var list = client.GetSystemWideList(new BluePrintFilterData { ForItem = new LinkToRepositoryLocalObjectData { IdRef = id } });
+            if (list == null || list.Length == 0)
+                return id;
+
+            var list2 = list.Cast<BluePrintNodeData>().Where(x => x.Item != null).ToList();
+
+            return list2.First().Item.Id;
+        }
 
         /// <summary>
         /// Gets tcm id of first localized or original item up the blue print.
