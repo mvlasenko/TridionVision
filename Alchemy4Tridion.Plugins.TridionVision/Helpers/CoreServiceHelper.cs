@@ -150,6 +150,39 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
 
         #endregion
 
+        #region Tridion schemas
+
+        /// <summary>
+        /// Gets the Tridion schema fields.
+        /// </summary>
+        /// <param name="client">Tridion client object.</param>
+        /// <param name="tcmSchema">The TCM schema.</param>
+        /// <returns></returns>
+        public static List<ItemFieldDefinitionData> GetSchemaFields(IAlchemyCoreServiceClient client, string tcmSchema)
+        {
+            SchemaFieldsData schemaFieldsData = client.ReadSchemaFields(tcmSchema, true, null);
+            if (schemaFieldsData == null || schemaFieldsData.Fields == null)
+                return null;
+
+            return schemaFieldsData.Fields.ToList();
+        }
+
+        /// <summary>
+        /// Gets the metadata schema fields.
+        /// </summary>
+        /// <param name="client">Tridion client object.</param>
+        /// <param name="tcmSchema">The TCM schema.</param>
+        /// <returns></returns>
+        public static List<ItemFieldDefinitionData> GetSchemaMetadataFields(IAlchemyCoreServiceClient client, string tcmSchema)
+        {
+            SchemaFieldsData schemaFieldsData = client.ReadSchemaFields(tcmSchema, true, null);
+            if (schemaFieldsData == null || schemaFieldsData.MetadataFields == null)
+                return null;
+
+            return schemaFieldsData.MetadataFields.ToList();
+        }
+
+        #endregion
         #region Multimedia
 
         public static byte[] GetBinaryFromMultimediaComponent(IAlchemyStreamDownload client, ComponentData multimediaComponent)
@@ -197,6 +230,10 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
 
             SchemaData schema = ReadItem(client, component.Schema.IdRef) as SchemaData;
             XNamespace ns = schema.NamespaceUri;
+
+            var fields = GetSchemaMetadataFields(client, component.Schema.IdRef);
+            if (fields.All(x => x.Name != "Keywords"))
+                throw new Exception("Keywords metadata field is not present");
 
             try
             {

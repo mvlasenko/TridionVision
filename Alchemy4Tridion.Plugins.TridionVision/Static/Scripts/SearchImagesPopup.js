@@ -38,7 +38,7 @@ Alchemy4Tridion.Plugins.TridionVision.SearchImagesPopup.prototype.initialize = f
         if(!word)
             word = "all";
 
-        showItems(uri, word, true);
+        showItems(uri, word, false);
     });
 
     $evt.addEventHandler(c.BtnOk, "click", function (e) {

@@ -20,8 +20,18 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
             {
                 //var yyy = CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, "tcm:5061-29508");
 
+                if (!this.Clients.IsImpersonationUserSet())
+                    throw new Exception("Core service client is not impersonated");
+
                 Settings settings = Plugin.Settings.Get<Settings>();
+
+                if(string.IsNullOrEmpty(settings.CategoryId) || settings.CategoryId == "tcm:1-1-512")
+                    throw new Exception("Settings CategoryId is not set");
+
                 List<ItemInfo> keywords = CoreServiceHelper.GetKeywordsByCategory(this.Clients.SessionAwareCoreServiceClient, settings.CategoryId);
+
+                if (string.IsNullOrEmpty(settings.ApiKeyFilePath))
+                    throw new Exception("Settings ApiKeyFilePath is not set");
 
                 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", settings.ApiKeyFilePath);
 
@@ -99,7 +109,7 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
 
                     item.Path = string.Join(", ", list);
 
-                    if (word == "all" || list.Contains(word) || !generate)
+                    if (word == "all" || list.Contains(word))
                     {
                         html += CreateItem(item) + Environment.NewLine;
                     }
