@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Alchemy4Tridion.Plugins.TridionVision.Models;
 using Alchemy4Tridion.Plugins.Clients;
 using Alchemy4Tridion.Plugins.Clients.CoreService;
@@ -148,111 +146,6 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
         public static List<ItemInfo> GetKeywordsByCategory(IAlchemyCoreServiceClient client, string tcmCategory)
         {
             return client.GetListXml(tcmCategory, new OrganizationalItemItemsFilterData { ItemTypes = new[] { ItemType.Keyword } }).ToList(ItemType.Keyword);
-        }
-
-        #endregion
-
-        #region Tridion schemas
-
-        /// <summary>
-        /// Gets the Tridion schema fields.
-        /// </summary>
-        /// <param name="client">Tridion client object.</param>
-        /// <param name="tcmSchema">The TCM schema.</param>
-        /// <returns></returns>
-        public static List<ItemFieldDefinitionData> GetSchemaFields(IAlchemyCoreServiceClient client, string tcmSchema)
-        {
-            SchemaFieldsData schemaFieldsData = client.ReadSchemaFields(tcmSchema, true, null);
-            if (schemaFieldsData == null || schemaFieldsData.Fields == null)
-                return null;
-
-            return schemaFieldsData.Fields.ToList();
-        }
-
-        /// <summary>
-        /// Gets the metadata schema fields.
-        /// </summary>
-        /// <param name="client">Tridion client object.</param>
-        /// <param name="tcmSchema">The TCM schema.</param>
-        /// <returns></returns>
-        public static List<ItemFieldDefinitionData> GetSchemaMetadataFields(IAlchemyCoreServiceClient client, string tcmSchema)
-        {
-            SchemaFieldsData schemaFieldsData = client.ReadSchemaFields(tcmSchema, true, null);
-            if (schemaFieldsData == null || schemaFieldsData.MetadataFields == null)
-                return null;
-
-            return schemaFieldsData.MetadataFields.ToList();
-        }
-
-        #endregion
-
-        #region Tridion components
-
-        /// <summary>
-        /// Gets xml element by xPath.
-        /// </summary>
-        /// <param name="root">Xml root object.</param>
-        /// <param name="xPath">XPath</param>
-        /// <param name="ns">Xml namespase</param>
-        /// <returns></returns>
-        public static XElement GetByXPath(this XElement root, string xPath, XNamespace ns)
-        {
-            if (root == null || string.IsNullOrEmpty(xPath))
-                return null;
-
-            xPath = xPath.Trim('/');
-            if (string.IsNullOrEmpty(xPath))
-                return null;
-
-            if (xPath.Contains("/"))
-            {
-                xPath = "/xhtml:" + xPath.Replace("/", "/xhtml:");
-                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(new NameTable());
-                namespaceManager.AddNamespace("xhtml", ns.ToString());
-                return root.XPathSelectElement(xPath, namespaceManager);
-            }
-
-            return root.Element(ns + xPath);
-        }
-
-        /// <summary>
-        /// Gets the list or xml elements by xPath.
-        /// </summary>
-        /// <param name="root">Xml root object.</param>
-        /// <param name="xPath">The x path.</param>
-        /// <param name="ns">Xml namespase</param>
-        /// <returns></returns>
-        public static List<XElement> GetListByXPath(this XElement root, string xPath, XNamespace ns)
-        {
-            if (root == null || string.IsNullOrEmpty(xPath))
-                return new List<XElement>();
-
-            xPath = xPath.Trim('/');
-
-            if (string.IsNullOrEmpty(xPath))
-                return null;
-
-            if (xPath.Contains("/"))
-            {
-                xPath = "/xhtml:" + xPath.Replace("/", "/xhtml:");
-                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(new NameTable());
-                namespaceManager.AddNamespace("xhtml", ns.ToString());
-                return root.XPathSelectElements(xPath, namespaceManager).ToList();
-            }
-
-            return root.Elements(ns + xPath).ToList();
-        }
-
-        /// <summary>
-        /// Gets the list or xml elements by xPath.
-        /// </summary>
-        /// <param name="elements">Xml elements.</param>
-        /// <param name="xPath">xPath.</param>
-        /// <param name="ns">Xml namespase</param>
-        /// <returns></returns>
-        public static List<XElement> GetListByXPath(this List<XElement> elements, string xPath, XNamespace ns)
-        {
-            return elements.SelectMany(x => x.GetListByXPath(xPath, ns)).ToList();
         }
 
         #endregion
