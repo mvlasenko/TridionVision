@@ -67,11 +67,24 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
         /// <param name="client">Tridion client object.</param>
         /// <param name="tcmContainer">The TCM container.</param>
         /// <param name="recursive">if set to <c>true</c> [recursive].</param>
-        /// <param name="itemTypes">Item types.</param>
+        /// <param name="componentTypes">component types</param>
         /// <returns></returns>
         public static List<ItemInfo> GetItemsByParentContainer(IAlchemyCoreServiceClient client, string tcmContainer, bool recursive, ComponentType[] componentTypes)
         {
             return client.GetListXml(tcmContainer, new OrganizationalItemItemsFilterData { Recursive = recursive, ItemTypes = new ItemType[] { ItemType.Component }, ComponentTypes = componentTypes }).ToList();
+        }
+
+        /// <summary>
+        /// Gets Tridion items by parent container.
+        /// </summary>
+        /// <param name="client">Tridion client object.</param>
+        /// <param name="tcmContainer">The TCM container.</param>
+        /// <param name="recursive">if set to <c>true</c> [recursive].</param>
+        /// <param name="schemaPurposes">schema types</param>
+        /// <returns></returns>
+        public static List<ItemInfo> GetItemsByParentContainer(IAlchemyCoreServiceClient client, string tcmContainer, bool recursive, SchemaPurpose[] schemaPurposes)
+        {
+            return client.GetListXml(tcmContainer, new OrganizationalItemItemsFilterData { Recursive = recursive, ItemTypes = new ItemType[] { ItemType.Schema }, SchemaPurposes = schemaPurposes }).ToList();
         }
 
         /// <summary>
@@ -148,6 +161,11 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
             return client.GetListXml(tcmCategory, new OrganizationalItemItemsFilterData { ItemTypes = new[] { ItemType.Keyword } }).ToList(ItemType.Keyword);
         }
 
+        public static List<ItemInfo> GetContainersByPublication(IAlchemyCoreServiceClient client, string tcmPublication)
+        {
+            return client.GetListXml(tcmPublication, new RepositoryItemsFilterData { ItemTypes = new[] { ItemType.Folder, ItemType.StructureGroup } }).ToList();
+        }
+
         #endregion
 
         #region Tridion schemas
@@ -183,7 +201,14 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
         }
 
         #endregion
+
         #region Multimedia
+
+        public static List<MultimediaTypeData> GetMimeTypes(IAlchemyCoreServiceClient client, string[] mimeTypes)
+        {
+            List<MultimediaTypeData> allMimeTypes = client.GetSystemWideList(new MultimediaTypesFilterData()).Cast<MultimediaTypeData>().ToList();
+            return allMimeTypes.Where(x => mimeTypes.Contains(x.MimeType)).ToList();
+        }
 
         public static byte[] GetBinaryFromMultimediaComponent(IAlchemyStreamDownload client, ComponentData multimediaComponent)
         {
@@ -277,31 +302,6 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Helpers
             {
                 client.UndoCheckOut(componentUri, true, new ReadOptions());
             }
-        }
-
-        #endregion
-
-        #region Tridion publishing
-
-        /// <summary>
-        /// Gets the published items.
-        /// </summary>
-        /// <param name="client">Tridion client object.</param>
-        /// <param name="id">item tcm id.</param>
-        /// <returns></returns>
-        public static List<string> GetPublishedTargets(IAlchemyCoreServiceClient client, string id)
-        {
-            return client.GetListPublishInfo(id).Select(publishData => publishData.PublicationTarget.IdRef).Distinct().ToList();
-        }
-
-        /// <summary>
-        /// Gets publishing targets.
-        /// </summary>
-        /// <param name="client">Tridion client object.</param>
-        /// <returns></returns>
-        public static string[] GetTargets(IAlchemyCoreServiceClient client)
-        {
-            return client.GetSystemWideList(new PublicationTargetsFilterData()).Select(x => x.Id).ToArray();
         }
 
         #endregion

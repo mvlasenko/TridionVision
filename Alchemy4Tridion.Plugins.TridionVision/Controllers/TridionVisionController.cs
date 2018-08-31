@@ -40,15 +40,9 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
 
                 string html = "<table class=\"usingItems results\">";
 
-                List<ItemInfo> items = GetMultimediaCompoents("tcm:" + tcmFolder);
+                List<ItemInfo> items = GetMultimediaComponents("tcm:" + tcmFolder);
 
-                foreach (ItemInfo item in items)
-                {
-                    if (!item.IsLocal)
-                    {
-                        item.TcmId = CoreServiceHelper.GetBluePrintTopTcmId(this.Clients.SessionAwareCoreServiceClient, item.TcmId);
-                    }
-                }
+                List<ItemInfo> schemas = GetAllowedSchemas(TextHelper.GetPublicationTcmId("tcm:" + tcmFolder));
 
                 html += CreateItemsHeading();
 
@@ -56,7 +50,11 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
                 foreach (ItemInfo item in items)
                 {
                     ComponentData component = CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, item.TcmId) as ComponentData;
-                    if (component == null || component.BinaryContent == null)
+                    if (component == null)
+                        continue;
+                    if(schemas.All(schema => schema.TcmId.GetId() != component.Schema.IdRef.GetId()))
+                        continue;
+                    if (component.BinaryContent == null)
                         continue;
 
                     item.Icon = "/WebUI/Editors/Base/icon.png?target=view&maxwidth=40&maxheight=200&uri=tcm%3A" + item.TcmId.Replace("tcm:", "") + "&mode=thumb&modified=" + component.VersionInfo.RevisionDate.Value.ToString("yyyy-MM-ddTHH:mm:ss.000");
@@ -127,15 +125,32 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
             }
         }
 
-        private List<ItemInfo> GetMultimediaCompoents(string tcmItem)
+        private List<ItemInfo> GetMultimediaComponents(string tcmItem)
         {
             if (CoreServiceHelper.GetItemType(tcmItem) == ItemType.Folder)
             {
-                return CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, tcmItem, true, new ComponentType[] { ComponentType.Multimedia });
+                List<ItemInfo> items = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, tcmItem, true, new ComponentType[] { ComponentType.Multimedia });
+
+                foreach (ItemInfo item in items)
+                {
+                    if (!item.IsLocal)
+                    {
+                        item.TcmId = CoreServiceHelper.GetBluePrintTopTcmId(this.Clients.SessionAwareCoreServiceClient, item.TcmId);
+                    }
+                }
+
+                return items;
             }
+
             if (CoreServiceHelper.GetItemType(tcmItem) == ItemType.Component)
             {
                 ComponentData component = (ComponentData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, tcmItem);
+
+                if (component.BluePrintInfo.IsShared == true)
+                {
+                    tcmItem = CoreServiceHelper.GetBluePrintTopTcmId(this.Clients.SessionAwareCoreServiceClient, tcmItem);
+                    component = (ComponentData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, tcmItem);
+                }
 
                 if (component.ComponentType == ComponentType.Multimedia)
                 {
@@ -147,7 +162,19 @@ namespace Alchemy4Tridion.Plugins.TridionVision.Controllers
                     return used.Select(x => (ComponentData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, x)).Where(x => x.ComponentType == ComponentType.Multimedia).Select(x => x.ToItem()).ToList();
                 }
             }
+
             return new List<ItemInfo>();
+        }
+
+        private List<ItemInfo> GetAllowedSchemas(string tcmPublication)
+        {
+            ItemInfo topFolder = CoreServiceHelper.GetContainersByPublication(this.Clients.SessionAwareCoreServiceClient, tcmPublication).First(x => x.ItemType == ItemType.Folder);
+
+            List<MultimediaTypeData> imageMimeTypes = CoreServiceHelper.GetMimeTypes(this.Clients.SessionAwareCoreServiceClient, new string[] { "image/jpeg", "image/png", "image/gif", "image/x-bmp" });
+
+            List<ItemInfo> allMmSchemas = CoreServiceHelper.GetItemsByParentContainer(this.Clients.SessionAwareCoreServiceClient, topFolder.TcmId, true, new SchemaPurpose[] { SchemaPurpose.Multimedia });
+
+            return allMmSchemas.Where(item => ((SchemaData)CoreServiceHelper.ReadItem(this.Clients.SessionAwareCoreServiceClient, item.TcmId)).AllowedMultimediaTypes.Any(mtRef => imageMimeTypes.Any(mt => mt.Id.GetId() == mtRef.IdRef.GetId()))).ToList();
         }
 
         private string CreateItemsHeading()
