@@ -185,9 +185,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Alchemy4Tridion.Plugin.1.0.9\build\net40\Alchemy4Tridion.Plugin.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Alchemy4Tridion.Plugin.1.0.9\build\net40\Alchemy4Tridion.Plugin.targets'))" />
   </Target>
-  <Target Name="Alchemy4TridionInstallLocal" AfterTargets="Build">
-    <Exec Command="powershell Update-AlchemyPlugin -File $(ProjectDir)bin\$(Configuration)\$(ProjectName).a4t" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
