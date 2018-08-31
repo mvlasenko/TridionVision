@@ -6,7 +6,7 @@ Generated keywords link to multimedia component via metadata.
 Implementation
 ==============
 Under the hood Google Vision service is used.<br />
-https://cloud.google.com/vision/
+https://cloud.google.com/vision/ <br />
 Service takes binary data of image and returns a list of keywords that describe image.
 Keywords can be generated for selected multimedia component or for all image components within the selected folder.
 All generated keywords go to single category.
